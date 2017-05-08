@@ -61,22 +61,13 @@ public class CSVParser {
         }
         Player tempPlayer = null;
         ArrayList<Season> seasons = null;
-        while(scan.hasNextLine()){
 
+        while(scan.hasNextLine()){
             if(scan.hasNext("#,,,,,,,,")) {
                 scan.nextLine();
                 seasons = new ArrayList<>();
                 String playerLine = scan.nextLine().trim();
-
-                playerData = playerLine.split(",");
-                String name = playerData[PLAYER_NAME];
-                String position = playerData[PLAYER_POSITION];
-                String dateOfBirth = playerData[PLAYER_BIRTH_DATE];
-                String placeOfBirth = playerData[PLAYER_BIRTH_PLACE];
-                double height = Double.parseDouble(playerData[PLAYER_HEIGHT]);
-                double weight = Double.parseDouble(playerData[PLAYER_WEIGHT]);
-                String shoots = playerData[PLAYER_SHOOTS];
-                tempPlayer = new Player(name, position, dateOfBirth, placeOfBirth, height, weight, shoots);
+                tempPlayer = storePlayerData(playerLine);
             } else {
                 String seasonLine = scan.nextLine().trim();
                 seasonData = seasonLine.split(",");
@@ -86,26 +77,11 @@ public class CSVParser {
                 Season tempSeason;
 
                 if (tempPlayer.getPosition().equalsIgnoreCase(DEFENSE)) {
-                    int goals = Integer.parseInt(seasonData[SEASON_GOALS]);
-                    int assists = Integer.parseInt(seasonData[SEASON_ASSISTS]);
-                    int points = Integer.parseInt(seasonData[SEASON_POINTS]);
-                    int penaltyMinutes = Integer.parseInt(seasonData[SEASON_PENALTY]);
-                    int plusMinus = Integer.parseInt(seasonData[SEASON_PLUS_MINUS]);
-                    tempSeason = new DefenceSeason(season, team, gamesPlayed, goals, assists, points, penaltyMinutes, plusMinus);
-
+                    tempSeason = storeDefenceSeason(season, team, gamesPlayed);
                 } else if (tempPlayer.getPosition().equalsIgnoreCase(GOALIE)) {
-                    int shutouts = Integer.parseInt(seasonData[SEASON_SHUTOUTS]);
-                    double goalsAgainst = Double.parseDouble(seasonData[SEASON_GOALS_AGAINST]);
-                    double savePercentage = Double.parseDouble(seasonData[SEASON_SAVE_PERCENTAGE]);
-                    tempSeason = new GoalieSeason(season, team, gamesPlayed, shutouts, goalsAgainst, savePercentage);
-
+                    tempSeason = storeGoalieSeason(season, team, gamesPlayed);
                 } else {
-                    int goals = Integer.parseInt(seasonData[SEASON_GOALS]);
-                    int assists = Integer.parseInt(seasonData[SEASON_ASSISTS]);
-                    int points = Integer.parseInt(seasonData[SEASON_POINTS]);
-                    int penaltyMinutes = Integer.parseInt(seasonData[SEASON_PENALTY]);
-                    tempSeason = new GoalScorerSeason(season, team, gamesPlayed, goals, assists, points, penaltyMinutes);
-
+                    tempSeason = storeOffenseSeason(season, team, gamesPlayed);
                 }
                 seasons.add(tempSeason);
             }
@@ -113,5 +89,45 @@ public class CSVParser {
         }
         scan.close();
         return seasonsByPlayer;
+    }
+
+    private Player storePlayerData(String playerLine){
+        playerData = playerLine.split(",");
+        String name = playerData[PLAYER_NAME];
+        String position = playerData[PLAYER_POSITION];
+        String dateOfBirth = playerData[PLAYER_BIRTH_DATE];
+        String placeOfBirth = playerData[PLAYER_BIRTH_PLACE];
+        double height = Double.parseDouble(playerData[PLAYER_HEIGHT]);
+        double weight = Double.parseDouble(playerData[PLAYER_WEIGHT]);
+        String shoots = playerData[PLAYER_SHOOTS];
+        Player tempPlayer = new Player(name, position, dateOfBirth, placeOfBirth, height, weight, shoots);
+        return tempPlayer;
+    }
+
+    private Season storeDefenceSeason(String season, String team, int gamesPlayed){
+        int goals = Integer.parseInt(seasonData[SEASON_GOALS]);
+        int assists = Integer.parseInt(seasonData[SEASON_ASSISTS]);
+        int points = Integer.parseInt(seasonData[SEASON_POINTS]);
+        int penaltyMinutes = Integer.parseInt(seasonData[SEASON_PENALTY]);
+        int plusMinus = Integer.parseInt(seasonData[SEASON_PLUS_MINUS]);
+        Season tempSeason = new DefenceSeason(season, team, gamesPlayed, goals, assists, points, penaltyMinutes, plusMinus);
+        return tempSeason;
+    }
+
+    private Season storeGoalieSeason(String season, String team, int gamesPlayed){
+        int shutouts = Integer.parseInt(seasonData[SEASON_SHUTOUTS]);
+        double goalsAgainst = Double.parseDouble(seasonData[SEASON_GOALS_AGAINST]);
+        double savePercentage = Double.parseDouble(seasonData[SEASON_SAVE_PERCENTAGE]);
+        Season tempSeason = new GoalieSeason(season, team, gamesPlayed, shutouts, goalsAgainst, savePercentage);
+        return tempSeason;
+    }
+
+    private Season storeOffenseSeason(String season, String team, int gamesPlayed){
+        int goals = Integer.parseInt(seasonData[SEASON_GOALS]);
+        int assists = Integer.parseInt(seasonData[SEASON_ASSISTS]);
+        int points = Integer.parseInt(seasonData[SEASON_POINTS]);
+        int penaltyMinutes = Integer.parseInt(seasonData[SEASON_PENALTY]);
+        Season tempSeason = new GoalScorerSeason(season, team, gamesPlayed, goals, assists, points, penaltyMinutes);
+        return tempSeason;
     }
 }
